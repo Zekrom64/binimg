@@ -1,0 +1,662 @@
+/*
+ * pe.h
+ *
+ *  Created on: Jan 1, 2019
+ *      Author: Zekrom_64
+ */
+
+#ifndef BINIMG_PE_H_
+#define BINIMG_PE_H_
+
+
+#include <stdint.h>
+
+#define PE_MAGIC 0x00004550
+
+typedef enum PEMachine {
+	PE_MACHINE_UNKNOWN = 0,
+	PE_MACHINE_AM33 = 0x1D3,
+	PE_MACHINE_AMD64 = 0x8664,
+	PE_MACHINE_ARM = 0x1C0,
+	PE_MACHINE_ARM64 = 0xAA64,
+	PE_MACHINE_ARMNT = 0x1C4,
+	PE_MACHINE_EBC = 0xEBC,
+	PE_MACHINE_I386 = 0x14C,
+	PE_MACHINE_IA64 = 0x200,
+	PE_MACHINE_M32R = 0x9041,
+	PE_MACHINE_MIPS16 = 0x266,
+	PE_MACHINE_MIPSFPU = 0x366,
+	PE_MACHINE_MIPSFPU16 = 0x466,
+	PE_MACHINE_POWERPC = 0x1F0,
+	PE_MACHINE_POWERPCFP = 0x1F1,
+	PE_MACHINE_F4000 = 0x166,
+	PE_MACHINE_RISCV32 = 0x5032,
+	PE_MACHINE_RISCV64 = 0x5064,
+	PE_MACHINE_RISCV128 = 0x5128,
+	PE_MACHINE_SH3 = 0x1A2,
+	PE_MACHINE_SH3DSP = 0x1A3,
+	PE_MACHINE_SH4 = 0x1A6,
+	PE_MACHINE_SH5 = 0x1A8,
+	PE_MACHINE_THUMB = 0x1C2,
+	PE_MACHINE_WCEMIPSV2 = 0x169
+};
+
+typedef enum PECharacteristics {
+	PE_CHAR_RELOCS_STRIPPED = 0x0001,
+	PE_CHAR_EXECUTABLE_IMAGE = 0x0002,
+	PE_CHAR_LINE_NUMS_STRIPPED = 0x0004,
+	PE_CHAR_LOCAL_SYMS_STRIPPED = 0x0008,
+	PE_CHAR_AGGRESSIVE_TRIM = 0x0010,
+	PE_CHAR_LARGE_ADDRESS_AWARE = 0x0020,
+	PE_CHAR_BYTES_REVERSED_LO = 0x0080,
+	PE_CHAR_32BIT_MACHINE = 0x0100,
+	PE_CHAR_DEBUG_STRIPPED = 0x0200,
+	PE_CHAR_REMOVABLE_RUN_FROM_SWAP = 0x0400,
+	PE_CHAR_NET_RUN_FROM_SWAP = 0x0800,
+	PE_CHAR_SYSTEM = 0x1000,
+	PE_CHAR_DLL = 0x2000,
+	PE_CHAR_UNIPROC_SYSTEM_ONLY = 0x4000,
+	PE_CHAR_BYTES_REVERSED_HI = 0x8000
+};
+
+typedef struct PEHeader {
+	uint32_t magic;
+	uint16_t machine;
+	uint16_t numSections;
+	uint32_t timestamp;
+	uint32_t symbolTableOffset;
+	uint32_t numSymbols;
+	uint16_t optionalHeaderSize;
+	uint16_t characteristics;
+};
+
+typedef enum PEOptionalHeaderMagic {
+	PE_MAGIC_PE32 = 0x010B,
+	PE_MAGIC_PE32PLUS = 0x020B
+};
+
+enum PESubsystem {
+	PE_SUBSYS_UNKNOWN = 0,
+	PE_SUBSYS_NATIVE = 1,
+	PE_SUBSYS_WINDOWS_GUI = 2,
+	PE_SUBSYS_WINDOWS_CUI = 3,
+	PE_SUBSYS_OS2_CUI = 5,
+	PE_SUBSYS_POSIX_CUI = 7,
+	PE_SUBSYS_NATIVE_WINDOWS = 8,
+	PE_SUBSYS_WINDOWS_CE_GUI = 9,
+	PE_SUBSYS_EFI_APPLICATION = 10,
+	PE_SUBSYS_EFI_BIT_SERVICE_DRIVER = 11,
+	PE_SUBSYS_EFI_RUNTIME_DRIVER = 12,
+	PE_SUBSYS_EFI_ROM = 13,
+	PE_SUBSYS_XBOX = 14,
+	PE_SUBSYS_WINDOWS_BOOT_APP = 16
+};
+
+enum PEDLLCharacteristics {
+	PE_DLLCHAR_HI_ENTROPY_VA = 0x0020,
+	PE_DLLCHAR_DYNAMIC_BASE = 0x0040,
+	PE_DLLCHAR_FORCE_INTEGRITY = 0x0080,
+	PE_DLLCHAR_NX_COMPAT = 0x0100,
+	PE_DLLCHAR_NO_ISOLATION = 0x0200,
+	PE_DLLCHAR_NO_SEH = 0x0400,
+	PE_DLLCHAR_NO_BIND = 0x0800,
+	PE_DLLCHAR_APPCONTAINER = 0x1000,
+	PE_DLLCHAR_WDM_DRIVER = 0x2000,
+	PE_DLLCHAR_GUARD_CF = 0x4000,
+	PE_DLLCHAR_TERM_SERVER_AWARE = 0x8000
+};
+
+typedef struct PEOptionalHeader {
+	uint16_t magic;
+	uint8_t linkerVersionMajor;
+	uint8_t linkerVersionMinor;
+	uint32_t codeSize;
+	uint32_t initDataSize;
+	uint32_t uninitDataSize;
+	uint32_t entryPointOffset;
+	uint32_t baseOfCode;
+	uint32_t baseOfData;
+	uint32_t imageBase;
+	uint32_t sectionAlignment;
+	uint32_t fileAlignment;
+	uint16_t osVersionMajor;
+	uint16_t osVersionMinor;
+	uint16_t imageVersionMajor;
+	uint16_t imageVersionMinor;
+	uint16_t subsystemVersionMajor;
+	uint16_t subsystemVersionMinor;
+	uint32_t win32Version;
+	uint32_t imageSize;
+	uint32_t headersSize;
+	uint32_t checksum;
+	uint16_t subsystem;
+	uint16_t dllCharacteristics;
+	uint32_t stackReserveSize;
+	uint32_t stackCommitSize;
+	uint32_t heapReserveSize;
+	uint32_t heapCommitSize;
+	uint32_t loaderFlags;
+	uint32_t numRVAsAndSizes;
+};
+
+typedef struct PE64OptionalHeader {
+	uint16_t magic;
+	uint8_t linkerVersionMajor;
+	uint8_t linkerVersionMinor;
+	uint32_t codeSize;
+	uint32_t initDataSize;
+	uint32_t uninitDataSize;
+	uint32_t entryPointOffset;
+	uint32_t baseOfCode;
+	uint64_t imageBase;
+	uint32_t sectionAlignment;
+	uint32_t fileAlignment;
+	uint16_t osVersionMajor;
+	uint16_t osVersionMinor;
+	uint16_t imageVersionMajor;
+	uint16_t imageVersionMinor;
+	uint16_t subsystemVersionMajor;
+	uint16_t subsystemVersionMinor;
+	uint32_t win32Version;
+	uint32_t imageSize;
+	uint32_t headersSize;
+	uint32_t checksum;
+	uint16_t subsystem;
+	uint16_t dllCharacteristics;
+	uint64_t stackReserveSize;
+	uint64_t stackCommitSize;
+	uint64_t heapReserveSize;
+	uint64_t heapCommitSize;
+	uint32_t loaderFlags;
+	uint32_t numRVAsAndSizes;
+};
+
+typedef struct PEDataDirectory {
+	uint32_t virtualAddress;
+	uint32_t size;
+};
+
+typedef enum PESectionCharacteristics {
+	PE_SECCHAR_TYPE_NO_PAD = 0x00000008,
+	PE_SECCHAR_CODE = 0x00000020,
+	PE_SECCHAR_INIT_DATA = 0x00000040,
+	PE_SECCHAR_UNINIT_DATA = 0x00000080,
+	PE_SECCHAR_LINK_OTHER = 0x00000100,
+	PE_SECCHAR_LINK_INFO = 0x00000200,
+	PE_SECCHAR_LINK_REMOVE = 0x00000800,
+	PE_SECCHAR_LINK_COMDAT = 0x00001000,
+	PE_SECCHAR_GPREL = 0x00008000,
+	PE_SECCHAR_MEM_PURGEABLE = 0x00020000,
+	PE_SECCHAR_MEM_16BIT = 0x00020000,
+	PE_SECCHAR_MEM_LOCKED = 0x00040000,
+	PE_SECCHAR_MEM_PRELOAD = 0x00080000,
+	PE_SECCHAR_LINK_NRELOC_OVFL = 0x01000000,
+	PE_SECCHAR_MEM_DISCARDABLE = 0x02000000,
+	PE_SECCHAR_MEM_NOT_CACHED = 0x04000000,
+	PE_SECCHAR_MEM_NOT_PAGED = 0x08000000,
+	PE_SECCHAR_MEM_SHARED = 0x10000000,
+	PE_SECCHAR_MEM_EXECUTE = 0x20000000,
+	PE_SECCHAR_MEM_READ = 0x40000000,
+	PE_SECCHAR_MEM_WRITE = 0x80000000
+};
+
+#define PE_SECCHAR_ALIGN(X) (1<<(((X>>20)&0xFF)-1))
+
+typedef struct PESectionHeader {
+	char name[8];
+	uint32_t virtualSize;
+	uint32_t virtualAddress;
+	uint32_t rawSize;
+	uint32_t rawOffset;
+	uint32_t reallocationsOffset;
+	uint32_t linenumsOffset;
+	uint32_t numReallocs;
+	uint32_t numLinenums;
+	uint32_t characteristics;
+};
+
+typedef enum PERelocType {
+	PE_RELTYPE_AMD64_ABSOLUTE = 0x0000,
+	PE_RELTYPE_AMD64_ADDR64 = 0x0001,
+	PE_RELTYPE_AMD64_ADDR32 = 0x0002,
+	PE_RELTYPE_AMD64_ADDR32NB = 0x0003,
+	PE_RELTYPE_AMD64_REL32 = 0x0004,
+	PE_RELTYPE_AMD64_REL32_1 = 0x0005,
+	PE_RELTYPE_AMD64_REL32_2 = 0x0006,
+	PE_RELTYPE_AMD64_REL32_3 = 0x0007,
+	PE_RELTYPE_AMD64_REL32_4 = 0x0008,
+	PE_RELTYPE_AMD64_REL32_5 = 0x0009,
+	PE_RELTYPE_AMD64_SECTION = 0x000A,
+	PE_RELTYPE_AMD64_SECREL = 0x000B,
+	PE_RELTYPE_AMD64_SECREL7 = 0x000C,
+	PE_RELTYPE_AMD64_TOKEN = 0x000D,
+	PE_RELTYPE_AMD64_SREL32 = 0x000E,
+	PE_RELTYPE_AMD64_PAIR = 0x000F,
+	PE_RELTYPE_AMD64_SSPAN32 = 0x0010,
+
+	PE_RELTYPE_ARM_ABSOLUTE = 0x0000,
+	PE_RELTYPE_ARM_ADDR32 = 0x0001,
+	PE_RELTYPE_ARM_ADDR32NB = 0x0002,
+	PE_RELTYPE_ARM_BRANCH24 = 0x0003,
+	PE_RELTYPE_ARM_BRANCH11 = 0x0004,
+	PE_RELTYPE_ARM_REL32 = 0x000A,
+	PE_RELTYPE_ARM_SECTION = 0x000E,
+	PE_RELTYPE_ARM_SECREL = 0x000F,
+	PE_RELTYPE_ARM_MOV32 = 0x0010,
+	PE_RELTYPE_THUMB_MOV32 = 0x0011,
+	PE_RELTYPE_THUMB_BRANCH20 = 0x0012,
+	PE_RELTYPE_THUMB_BRANCH24 = 0x0014,
+	PE_RELTYPE_THUMB_BLX23 = 0x0014,
+	PE_RELTYPE_ARM_PAIR = 0x0016,
+
+	PE_RELTYPE_ARM64_ABSOLUTE = 0x0000,
+	PE_RELTYPE_ARM64_ADDR32 = 0x0001,
+	PE_RELTYPE_ARM64_ADDR32NB = 0x0002,
+	PE_RELTYPE_ARM64_BRANCH26 = 0x0003,
+	PE_RELTYPE_ARM64_PAGEBASE_REL21 = 0x0004,
+	PE_RELTYPE_ARM64_REL21 = 0x0005,
+	PE_RELTYPE_ARM64_PAGEOFFSET_12A = 0x0006,
+	PE_RELTYPE_ARM64_PAGEOFFSET_12L = 0x0007,
+	PE_RELTYPE_ARM64_SECREL = 0x0008,
+	PE_RELTYPE_ARM64_SECREL_LOW12A = 0x0009,
+	PE_RELTYPE_ARM64_SECREL_HIGH12A = 0x000A,
+	PE_RELTYPE_ARM64_SECREL_LOW12L = 0x000B,
+	PE_RELTYPE_ARM64_TOKEN = 0x000C,
+	PE_RELTYPE_ARM64_SECTION = 0x000D,
+	PE_RELTYPE_ARM64_ADDR64 = 0x000E,
+	PE_RELTYPE_ARM64_BRANCH19 = 0x000F,
+	PE_RELTYPE_ARM64_BRANCH14 = 0x0010,
+	PE_RELTYPE_ARM64_REL32 = 0x0011,
+
+	PE_RELTYPE_SH3_ABSOLUTE = 0x0000,
+	PE_RELTYPE_SH3_DIRECT16 = 0x0001,
+	PE_RELTYPE_SH3_DIRECT32 = 0x0002,
+	PE_RELTYPE_SH3_DIRECT8 = 0x0003,
+	PE_RELTYPE_SH3_DIRECT8_WORD = 0x0004,
+	PE_RELTYPE_SH3_DIRECT8_LONG = 0x0005,
+	PE_RELTYPE_SH3_DIRECT4 = 0x0006,
+	PE_RELTYPE_SH3_DIRECT8_WORD = 0x0007,
+	PE_RELTYPE_SH3_DIRECT8_LONG = 0x0008,
+	PE_RELTYPE_SH3_PCREL8_WORD = 0x0009,
+	PE_RELTYPE_SH3_PCREL8_LONG = 0x000A,
+	PE_RELTYPE_SH3_PCREL12_WORD = 0x000B,
+	PE_RELTYPE_SH3_STARTOF_SECTION = 0x000C,
+	PE_RELTYPE_SH3_SIZEOF_SECTION = 0x000D,
+	PE_RELTYPE_SH3_SECTION = 0x000E,
+	PE_RELTYPE_SH3_SECREL = 0x000F,
+	PE_RELTYPE_SH3_DIRECT32_NB = 0x0010,
+	PE_RELTYPE_SH3_GPREL4_LONG = 0x0011,
+	PE_RELTYPE_SH3_TOKEN = 0x0012,
+	PE_RELTYPE_SHM_PCRELPT = 0x0013,
+	PE_RELTYPE_SHM_REFLO = 0x0014,
+	PE_RELTYPE_SHM_REFHALF = 0x015,
+	PE_RELTYPE_SHM_RELLO = 0x0016,
+	PE_RELTYPE_SHM_RELHALF = 0x0017,
+	PE_RELTYPE_SHM_PAIR = 0x0018,
+	PE_RELTYPE_SHM_NOMODE = 0x8000,
+
+	PE_RELTYPE_PPC_ABSOLUTE = 0x0000,
+	PE_RELTYPE_PPC_ADDR64 = 0x0001,
+	PE_RELTYPE_PPC_ADDR32 = 0x0002,
+	PE_RELTYPE_PPC_ADDR24 = 0x0003,
+	PE_RELTYPE_PPC_ADDR16 = 0x0004,
+	PE_RELTYPE_PPC_ADDR14 = 0x0005,
+	PE_RELTYPE_PPC_REL24 = 0x0006,
+	PE_RELTYPE_PPC_REL14 = 0x0007,
+	PE_RELTYPE_PPC_ADDR32NB = 0x000A,
+	PE_RELTYPE_PPC_SECREL = 0x000B,
+	PE_RELTYPE_PPC_SECTION = 0x000C,
+	PE_RELTYPE_PPC_SECREL16 = 0x000F,
+	PE_RELTYPE_PPC_REFHI = 0x0010,
+	PE_RELTYPE_PPC_REFLO = 0x0011,
+	PE_RELTYPE_PPC_PAIR = 0x0012,
+	PE_RELTYPE_PPC_SECRELLO = 0x0013,
+	PE_RELTYPE_PPC_GPREL = 0x0015,
+	PE_RELTYPE_PPC_TOKEN = 0x0016,
+
+	PE_RELTYPE_I386_ABSOLUTE = 0x0000,
+	PE_RELTYPE_I386_DIR16 = 0x0001,
+	PE_RELTYPE_I386_REL16 = 0x0002,
+	PE_RELTYPE_I386_DIR32 = 0x0006,
+	PE_RELTYPE_I386_DIR32NB = 0x0007,
+	PE_RELTYPE_I386_SEG12 = 0x0009,
+	PE_RELTYPE_I386_SECTION = 0x000A,
+	PE_RELTYPE_I386_SECREL = 0x000B,
+	PE_RELTYPE_I386_TOKEN = 0x000C,
+	PE_RELTYPE_I386_SECREL7 = 0x000D,
+	PE_RELTYPE_I386_REL32 = 0x0014,
+
+	PE_RELTYPE_IA64_ABSOLUTE = 0x0000,
+	PE_RELTYPE_IA64_IMM14 = 0x0001,
+	PE_RELTYPE_IA64_IMM22 = 0x0002,
+	PE_RELTYPE_IA64_IMM64 = 0x0003,
+	PE_RELTYPE_IA64_DIR32 = 0x0004,
+	PE_RELTYPE_IA64_DIR64 = 0x0005,
+	PE_RELTYPE_IA64_PCREL21B = 0x0006,
+	PE_RELTYPE_IA64_PCREL21M = 0x0007,
+	PE_RELTYPE_IA64_PCREL21F = 0x0008,
+	PE_RELTYPE_IA64_GPREL22 = 0x0009,
+	PE_RELTYPE_IA64_LTOFF22 = 0x000A,
+	PE_RELTYPE_IA64_SECTION = 0x000B,
+	PE_RELTYPE_IA64_SECREL22 = 0x000C,
+	PE_RELTYPE_IA64_SECREL64I = 0x000D,
+	PE_RELTYPE_IA64_SECREL32 = 0x000E,
+	PE_RELTYPE_IA64_DIR32NB = 0x0010,
+	PE_RELTYPE_IA64_SREL14 = 0x0011,
+	PE_RELTYPE_IA64_SREL22 = 0x0012,
+	PE_RELTYPE_IA64_SREL32 = 0x0013,
+	PE_RELTYPE_IA64_UREL32 = 0x0014,
+	PE_RELTYPE_IA64_PCREL60X = 0x0015,
+	PE_RELTYPE_IA64_PCREL60B = 0x0016,
+	PE_RELTYPE_IA64_PCREL60F = 0x0017,
+	PE_RELTYPE_IA64_PCREL60I = 0x0018,
+	PE_RELTYPE_IA64_PCREL60M = 0x0019,
+	PE_RELTYPE_IA64_IMMGPREL64 = 0x001A,
+	PE_RELTYPE_IA64_TOKEN = 0x001B,
+	PE_RELTYPE_IA64_GPREL32 = 0x001C,
+	PE_RELTYPE_IA64_ADDEND = 0x001F,
+
+	PE_RELTYPE_MIPS_ABSOLUTE = 0x0000,
+	PE_RELTYPE_MIPS_REFHALF = 0x0001,
+	PE_RELTYPE_MIPS_REFWORD = 0x0002,
+	PE_RELTYPE_MIPS_JMPADDR = 0x0003,
+	PE_RELTYPE_MIPS_REFHI = 0x0004,
+	PE_RELTYPE_MIPS_REFLO = 0x0005,
+	PE_RELTYPE_MIPS_GPREL = 0x0006,
+	PE_RELTYPE_MIPS_LITERAL = 0x0007,
+	PE_RELTYPE_MIPS_SECTION = 0x000A,
+	PE_RELTYPE_MIPS_SECREL = 0x000B,
+	PE_RELTYPE_MIPS_SECRELLO = 0x000C,
+	PE_RELTYPE_MIPS_SECRELHI = 0x000D,
+	PE_RELTYPE_MIPS_JMPADDR16 = 0x0010,
+	PE_RELTYPE_MIPS_REFWORDNB = 0x0022,
+	PE_RELTYPE_MIPS_PAIR = 0x0025,
+
+	PE_RELTYPE_M32R_ABSOLUTE = 0x0000,
+	PE_RELTYPE_M32R_ADDR32 = 0x0001,
+	PE_RELTYPE_M32R_ADDR32NB = 0x0002,
+	PE_RELTYPE_M32R_ADDR24 = 0x0003,
+	PE_RELTYPE_M32R_GPREL16 = 0x0004,
+	PE_RELTYPE_M32R_PCREL24 = 0x0005,
+	PE_RELTYPE_M32R_PCREL16 = 0x0006,
+	PE_RELTYPE_M32R_PCREL8 = 0x0007,
+	PE_RELTYPE_M32R_REFHALF = 0x0008,
+	PE_RELTYPE_M32R_REFHI = 0x0009,
+	PE_RELTYPE_M32R_REFLO = 0x000A,
+	PE_RELTYPE_M32R_PAIR = 0x000B,
+	PE_RELTYPE_M32R_SECTION = 0x000C,
+	PE_RELTYPE_M32R_SECREL = 0x000D,
+	PE_RELTYPE_M32R_TOKEN = 0x000E
+};
+
+typedef struct PERelocation {
+	uint32_t virtualAddress;
+	uint32_t symbolTableIndex;
+	uint16_t type;
+};
+
+typedef union PELineNumberType {
+	uint32_t symbolTableIndex;
+	uint32_t virtualAddress;
+};
+
+typedef struct PELineNumber {
+	PELineNumberType type;
+	uint16_t lineNumber;
+};
+
+typedef struct PESymbolLongName {
+	uint32_t zero;
+	uint32_t stringTableOffset;
+};
+
+typedef union PESymbolName {
+	char shortname[8];
+	PESymbolLongName longname;
+};
+
+typedef enum PESymbolType {
+	PE_SYMTYPE_DATA = 0x00,
+	PE_SYMTYPE_FUNCTION = 0x20
+};
+
+typedef enum PESymbolSectionNum {
+	PE_SYMSECNUM_UNDEFINED = 0,
+	PE_SYMSECNUM_ABSOLUTE = -1,
+	PE_SYMSECNUM_DEBUG = -2
+};
+
+#define PE_SYMBOL_TYPE_COMPLEX(X) (X>>8)
+#define PE_SYMBOL_TYPE_BASE(X) (X&0xFF)
+
+typedef enum PESymbolTypeComplex {
+	PE_SYMCOMPLEX_NONE = 0,
+	PE_SYMCOMPLEX_POINTER = 1,
+	PE_SYMCOMPLEX_FUNCTION = 2,
+	PE_SYMCOMPLEX_ARRAY = 3
+};
+
+typedef enum PESymbolTypeBase {
+	PE_SYMBASE_NULL = 0,
+	PE_SYMBASE_VOID = 1,
+	PE_SYMBASE_CHAR = 2,
+	PE_SYMBASE_SHORT = 3,
+	PE_SYMBASE_INT = 4,
+	PE_SYMBASE_LONG = 5,
+	PE_SYMBASE_FLOAT = 6,
+	PE_SYMBASE_DOUBLE = 7,
+	PE_SYMBASE_STRUCT = 8,
+	PE_SYMBASE_UNION = 9,
+	PE_SYMBASE_ENUM = 10,
+	PE_SYMBASE_MOE = 11,
+	PE_SYMBASE_BYTE = 12,
+	PE_SYMBASE_WORD = 13,
+	PE_SYMBASE_UINT = 14,
+	PE_SYMBASE_DWORD = 15
+};
+
+typedef enum PESymbolStorageClass {
+	PE_SYMCLASS_END_OF_FUNCTION = -1,
+	PE_SYMCLASS_NULL = 0,
+	PE_SYMCLASS_AUTOMATIC = 1,
+	PE_SYMCLASS_EXTERNAL = 2,
+	PE_SYMCLASS_STATIC = 3,
+	PE_SYMCLASS_REGISTER = 4,
+	PE_SYMCLASS_EXTERNAL_DEF = 5,
+	PE_SYMCLASS_LABEL = 6,
+	PE_SYMCLASS_UNDEFINED_LABEL = 7,
+	PE_SYMCLASS_MEMBER_OF_STRUCT = 8,
+	PE_SYMCLASS_ARGUMENT = 9,
+	PE_SYMCLASS_STRUCT_TAG = 10,
+	PE_SYMCLASS_MEMBER_OF_UNION = 11,
+	PE_SYMCLASS_UNION_TAG = 12,
+	PE_SYMCLASS_TYPE_DEFINITION = 13,
+	PE_SYMCLASS_UNDEFINED_STATIC = 14,
+	PE_SYMCLASS_ENUM_TAG = 15,
+	PE_SYMCLASS_MEMBER_OF_ENUM = 16,
+	PE_SYMCLASS_REGISTER_PARAM = 17,
+	PE_SYMCLASS_BIT_FIELD = 18,
+	PE_SYMCLASS_BLOCK = 100,
+	PE_SYMCLASS_FUNCTION = 101,
+	PE_SYMCLASS_END_OF_STRUCT = 102,
+	PE_SYMCLASS_FILE = 103,
+	PE_SYMCLASS_SECTION = 104,
+	PE_SYMCLASS_WEAK_EXTERNAL = 105,
+	PE_SYMCLASS_CLR_TOKEN = 107
+};
+
+typedef struct PESymbol {
+	PESymbolName name;
+	uint32_t value;
+	int16_t sectionNumber;
+	uint16_t type;
+	int8_t storageClass;
+	uint8_t numAuxSymbols;
+};
+
+typedef struct PEAuxFunctionDef {
+	uint32_t tagIndex;
+	uint32_t totalSize;
+	uint32_t linenumOffset;
+	uint32_t nextFunctionOffset;
+	uint16_t reserved0;
+};
+
+typedef struct PEAuxBFEF {
+	uint32_t reserved0;
+	uint16_t lineNumber;
+	char reserved1[6];
+	uint32_t nextFunctionOffset;
+};
+
+typedef struct PEAuxWeakExternal {
+	uint32_t tagIndex;
+	uint32_t characteristics;
+	char reserved0[10];
+};
+
+typedef struct PEAuxFile {
+	char filename[18];
+};
+
+typedef struct PEAuxSectionDef {
+	uint32_t length;
+	uint16_t numRelocs;
+	uint16_t numLinenums;
+	uint32_t checksum;
+	uint16_t number;
+	uint8_t selection;
+	char reserved0[3];
+};
+
+typedef union PEAuxFormat {
+	PEAuxFunctionDef functionDef;
+	PEAuxBFEF beginEndFunction;
+	PEAuxWeakExternal weakExternal;
+	PEAuxFile file;
+	PEAuxSectionDef sectionDef;
+};
+
+typedef enum PECOMDATSelection {
+	PE_COMDAT_NODUPLICATES = 1,
+	PE_COMDAT_ANY = 2,
+	PE_COMDAT_SAME_SIZE = 3,
+	PE_COMDAT_EXACTMATCH = 4,
+	PE_COMDAT_ASSOCIATIVE = 5,
+	PE_COMDAT_LARGEST = 6
+};
+
+typedef struct PECLRToken {
+	uint8_t auxType;
+	uint8_t reserved0;
+	uint32_t symbolTableIndex;
+	char reserved1[12];
+};
+
+typedef enum PECertificateRevision {
+	PE_CERTREV_1_0 = 0x0100,
+	PE_CERTREF_2_0 = 0x0200
+};
+
+typedef enum PECertificateType {
+	PE_CERTTYPE_X509 = 0x0001,
+	PE_CERTTYPE_PKCS_SIGNED_DATA = 0x0002,
+	PE_CERTTYPE_TS_STACK_SIGNED = 0x0004
+};
+
+typedef struct PEAttributeCertificate {
+	uint32_t length;
+	uint16_t revision;
+	uint16_t certificateType;
+	char certificate[];
+};
+
+typedef struct PEDelayLoad {
+	uint32_t attributes;
+	uint32_t name;
+	uint32_t moduleHandle;
+	uint32_t delayImportAddressTable;
+	uint32_t delayImportNameTable;
+	uint32_t boundDelayImportTable;
+	uint32_t unloadDelayImportTable;
+	uint32_t timestamp;
+};
+
+#define PE_SECNAME_UNINIT_DATA ".bss"
+#define PE_SECNAME_CLR_METADATA ".cormeta"
+#define PE_SECNAME_INIT_DATA ".data"
+#define PE_SECNAME_FPO_DEBUG ".debug$F"
+#define PE_SECNAME_PRECOMP_DEBUG ".debug$P"
+#define PE_SECNAME_SYMBOL_DEBUG ".debug$S"
+#define PE_SECNAME_TYPE_DEBUG ".debug$T"
+#define PE_SECNAME_LINK_OPTS ".drective"
+#define PE_SECNAME_EXPORT_TABLE ".edata"
+#define PE_SECNAME_IMPORT_TABLE ".idata"
+#define PE_SECNAME_IDL_SYMBOL ".idlsym"
+#define PE_SECNAME_EXCEPT_INFO ".pdata"
+#define PE_SECNAME_READONLY_INIT_DATA ".rdata"
+#define PE_SECNAME_RELOCATIONS ".reloc"
+#define PE_SECNAME_RESOURCE_DIR ".rsrc"
+#define PE_SECNAME_GPREL_UNINIT_DATA ".sbss"
+#define PE_SECNAME_GPREL_INIT_DATA ".sdata"
+#define PE_SECNAME_GPREL_READONLY_INIT_DATA ".srdata"
+#define PE_SECNAME_EXCEPT_HANDLE_DATA ".sxdata"
+#define PE_SECNAME_EXEC_CODE ".text"
+#define PE_SECNAME_THREADLOCAL ".tls"
+#define PE_SECNAME_GPREL_INIT_ARM ".vsdata"
+#define PE_SECNAME_EXCEPT_INFO2 ".xdata"
+
+typedef enum PEDebugType {
+	PE_DBGTYPE_UNKNOWN = 0,
+	PE_DGBTYPE_COFF = 1,
+	PE_DBGTYPE_CODEVIEW = 2,
+	PE_DBGTYPE_FPO,
+	PE_DBGTYPE_MISC = 4,
+	PE_DBGTYPE_EXCEPTION = 5,
+	PE_DBGTYPE_FIXUP = 6,
+	PE_DBGTYPE_OMAP_TO_SRC = 7,
+	PE_DBGTYPE_OMAP_FROM_SRC = 8,
+	PE_DBGTYPE_BORLAND = 9,
+	PE_DBGTYPE_CLSID = 11,
+	PE_DBGTYPE_REPRO = 16
+};
+
+typedef struct PEDebugDirectory {
+	uint32_t characteristics;
+	uint32_t timeDateStamp;
+	uint16_t versionMajor;
+	uint16_t versionMinor;
+	uint32_t type;
+	uint32_t sizeOfData;
+	uint32_t dataOffset;
+	uint32_t debugOffset;
+};
+
+typedef struct PEExportDirectory {
+	uint32_t flags;
+	uint32_t timeDateStamp;
+	uint16_t versionMajor;
+	uint16_t versionMinor;
+	uint32_t nameOffset;
+	uint32_t ordinalBase;
+	uint32_t numAddressEntries;
+	uint32_t numNameEntries;
+	uint32_t exportAddressTableOffset;
+	uint32_t nameTableOffset;
+	uint32_t ordinalTableOffset;
+};
+
+typedef struct PEExportAddress {
+	uint32_t exportOffset;
+	uint32_t forwarderOffset;
+};
+
+typedef struct PEImportDirectory {
+	uint32_t importLookupOffset;
+	uint32_t timeDateStamp;
+	uint32_t forwarderChain;
+	uint32_t nameOffset;
+	uint32_t importAddressTableOffset;
+};
+
+#endif /* BINIMG_PE_H_ */
